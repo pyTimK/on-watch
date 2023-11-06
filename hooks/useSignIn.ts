@@ -21,7 +21,6 @@ function useSignInPage() {
   const passwordRef = useRef<HTMLInputElement>(null);
   const [errorEmailInput, setErrorEmailInput] = useState(false);
   const [errorPasswordInput, setErrorPasswordInput] = useState(false);
-  const { setShowSignIn } = useContext(PagesWrapperContext);
 
   function toggleType() {
     setType(type === SignInType.signIn ? SignInType.logIn : SignInType.signIn);
@@ -65,7 +64,6 @@ function useSignInPage() {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        setShowSignIn(true);
         // ...
       })
       .catch((error) => {
@@ -97,7 +95,6 @@ function useSignInPage() {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        setShowSignIn(true);
       })
       .catch((error) => {
         const errorCode = error.code;
