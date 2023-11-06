@@ -11,6 +11,7 @@ import { db } from "../firebase";
 import MainPage from "./MainPage";
 import FirebaseHelper from "@/classes/FirebaseHelper";
 import { useLocationData } from "@/hooks/custom/useLocationData";
+import RegisterPage from "./RegisterPage";
 
 export const PagesWrapperContext = createContext({
   user: {} as User,
@@ -29,7 +30,9 @@ const PagesWrapper: React.FC<PagesWrapperProps> = ({ user }) => {
     constructEmptyMyUserData
   );
 
-  //! Location Data
+  if (myUserData === null) return <RegisterPage user={user} />;
+
+  // //! Location Data
   const locationData = useLocationData(myUserData.watch_id);
 
   return (

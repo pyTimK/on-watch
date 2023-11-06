@@ -9,7 +9,6 @@ interface MyInputProps {
   error?: boolean;
   onChange?: ChangeEventHandler<HTMLInputElement>;
   dark?: boolean;
-  bg?: string;
   className?: string;
   defaultValue?: string;
 }

@@ -24,8 +24,8 @@ export const convertTimestampsToDate = (input: any): any => {
 const useFirestoreData = <T>(
   dataDocRef: DocumentReference,
   constructEmpty: () => T
-): FirestoreDataType<T> => {
-  const [data, setData] = useState(constructEmpty);
+): FirestoreDataType<T> | null => {
+  const [data, setData] = useState<T | null>(constructEmpty);
 
   const updateData = async (new_fields: Partial<T>) => {
     await updateDoc(dataDocRef, { ...new_fields });
@@ -33,12 +33,20 @@ const useFirestoreData = <T>(
 
   useEffect(() => {
     const unsub = onSnapshot(dataDocRef, (doc) => {
-      let rawData = doc.data();
-      const dataWithConvertedDates = convertTimestampsToDate(rawData);
-      setData((dataWithConvertedDates as T) ?? constructEmpty());
+      if (doc.exists()) {
+        let rawData = doc.data();
+        const dataWithConvertedDates = convertTimestampsToDate(rawData);
+        setData((dataWithConvertedDates as T) ?? null);
+      } else {
+        setData(null);
+      }
     });
     return () => unsub();
-  }, []);
+  }, [dataDocRef]);
+
+  if (data === null) {
+    return null;
+  }
 
   return { ...data, updateData };
 };

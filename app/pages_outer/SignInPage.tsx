@@ -1,4 +1,5 @@
 import Title from "@/components/custom/Title";
+import VisibilityIcon from "@/components/svg/icon_animated/visibility/VisibilityIcon";
 import MyButton from "@/components/templates/MyButton";
 import MyInput from "@/components/templates/MyInput";
 import SizedBox from "@/components/templates/SizedBox";
@@ -28,19 +29,23 @@ const SignInPage: React.FC = () => {
         <SizedBox height={120} />
         <div className="m-auto w-60">
           <Title />
+          <VisibilityIcon />
         </div>
+        <SizedBox height={20} />
         <form
           className="flex flex-col justify-center space-y-10"
           onSubmit={type === SignInType.signIn ? login : signup}
         >
           <MyInput
             placeholder="Email"
+            className="bg-transparent"
             error={errorEmailInput}
             innerRef={emailRef}
             onChange={() => setErrorEmailInput(false)}
           />
           <MyInput
             placeholder="Password"
+            className="bg-transparent"
             type="password"
             error={errorPasswordInput}
             innerRef={passwordRef}
@@ -51,14 +56,20 @@ const SignInPage: React.FC = () => {
             label={type === SignInType.signIn ? "LOGIN" : "SIGN UP"}
           />
         </form>
-        <p
-          className={`${interFont} text-link fit-content m-auto`}
-          onClick={forgotPassword}
-        >
-          FORGOT PASSWORD&#63;
-        </p>
+        <SizedBox height={10} />
+
+        <div className="h-10 flex items-end">
+          {type == SignInType.signIn && (
+            <p
+              className={`${interFont} text-xs text-darkest_primary fit-content m-auto select-none cursor-pointer`}
+              onClick={forgotPassword}
+            >
+              FORGOT PASSWORD&#63;
+            </p>
+          )}
+        </div>
         <div className="flex flex-row items-center justify-center">
-          <p className={`${interFont} text-text_gray fit-content m-0 text-sm`}>
+          <p className={`${interFont} text-text_gray fit-content m-0 text-xs`}>
             {type == SignInType.signIn
               ? "DON'T HAVE AN ACOUNT?"
               : "ALREADY HAVE AN ACCOUNT?"}
@@ -66,7 +77,7 @@ const SignInPage: React.FC = () => {
           <SizedBox width={10} />
           <p
             onClick={toggleType}
-            className={`${interFont} text-link fit-content m-0 text-sm`}
+            className={`${interFont} text-darkest_primary fit-content m-0 text-xs`}
           >
             {type == SignInType.signIn ? "CREATE ONE" : "LOGIN"}
           </p>

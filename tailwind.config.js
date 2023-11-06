@@ -18,6 +18,7 @@ module.exports = {
         light_primary: "#F99394",
         darker_primary: "#EC354B",
         darkest_primary: "#EB1C36",
+        link: "#15233D",
 
         // custom
         bg: "#F7F7F7",
