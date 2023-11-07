@@ -5,6 +5,7 @@ import MyInput from "@/components/templates/MyInput";
 import SizedBox from "@/components/templates/SizedBox";
 import useSignInPage, { SignInType } from "@/hooks/useSignIn";
 import { interFont, jsoFont } from "@/styles/fonts";
+import { useState } from "react";
 
 const SignInPage: React.FC = () => {
   const {
@@ -21,6 +22,8 @@ const SignInPage: React.FC = () => {
     forgotPassword,
   } = useSignInPage();
 
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <div>
       <div
@@ -29,7 +32,6 @@ const SignInPage: React.FC = () => {
         <SizedBox height={120} />
         <div className="m-auto w-60">
           <Title />
-          <VisibilityIcon />
         </div>
         <SizedBox height={20} />
         <form
@@ -43,14 +45,23 @@ const SignInPage: React.FC = () => {
             innerRef={emailRef}
             onChange={() => setErrorEmailInput(false)}
           />
-          <MyInput
-            placeholder="Password"
-            className="bg-transparent"
-            type="password"
-            error={errorPasswordInput}
-            innerRef={passwordRef}
-            onChange={() => setErrorPasswordInput(false)}
-          />
+          <div className="relative">
+            <MyInput
+              placeholder="Password"
+              className="bg-transparent"
+              type={showPassword ? "text" : "password"}
+              error={errorPasswordInput}
+              innerRef={passwordRef}
+              onChange={() => setErrorPasswordInput(false)}
+            />
+            <div className="w-6 h-6 absolute right-3 top-1/2 -translate-y-1/2">
+              <VisibilityIcon
+                isOpen={showPassword}
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            </div>
+          </div>
+
           <MyButton
             type="submit"
             label={type === SignInType.signIn ? "LOGIN" : "SIGN UP"}

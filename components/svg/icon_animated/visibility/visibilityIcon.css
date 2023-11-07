@@ -4,6 +4,7 @@
   --delay-lashes: var(--duration-blink);
   --duration-pupil: 0.1s;
   --delay-pupil: calc(var(--duration-blink) * 2 / 3);
+  --eye-color: #747474;
 }
 #eye-bottom,
 #eye-top {
