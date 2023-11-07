@@ -1,7 +1,7 @@
 import { toast, TypeOptions } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const defaultOptions = { duration: 200000, type: "error" as TypeOptions };
+const defaultOptions = { duration: 2000, type: "error" as TypeOptions };
 
 const notify = (
   text: string | React.FC,
@@ -16,8 +16,9 @@ const notify = (
     closeOnClick: true,
     pauseOnHover: true,
     draggable: true,
-    icon: false,
+    icon: true,
     progress: undefined,
+    theme: "colored",
     type: options.type,
   });
 };

@@ -19,34 +19,38 @@ const MyButton: React.FC<MyButtonProps> = ({
   label,
   type,
   pX = 1.2,
-  pY = 0.5,
+  pY = 0.7,
   disabled,
   className,
   classNameText,
 }) => {
   return (
-    <motion.button
-      type={type}
-      disabled={disabled}
-      className={twMerge(
-        "rounded-full bg-darker_primary m-auto shadow-none outline-none fit-content",
-        className,
-        disabled ? "cursor-default opacity-50" : "cursor-pointer opacity-100"
-      )}
+    <motion.div
+      className="text-center w-full rounded-lg bg-darker_primary m-auto shadow-none outline-none select-none"
       onClick={onClick}
       whileTap={{ scale: disabled ? 1.0 : 0.8 }}
     >
-      <p
+      <button
+        type={type}
+        disabled={disabled}
         className={twMerge(
-          "text-white font-light fit-content m-auto",
-          classNameText,
-          jsoFont
+          "m-auto min-w-full min-h-full rounded-lg",
+          className,
+          disabled ? "cursor-default opacity-50" : "cursor-pointer opacity-100"
         )}
-        style={{ padding: `${pY}rem ${pX}rem` }}
       >
-        {label}
-      </p>
-    </motion.button>
+        <p
+          className={twMerge(
+            "text-white font-light w-max m-auto",
+            classNameText,
+            jsoFont
+          )}
+          style={{ padding: `${pY}rem ${pX}rem` }}
+        >
+          {label}
+        </p>
+      </button>
+    </motion.div>
   );
 };
 

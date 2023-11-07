@@ -29,11 +29,7 @@ const SignInPage: React.FC = () => {
       <div
         className={`flex flex-col items-ceter justify-center space-y-8 px-10`}
       >
-        <SizedBox height={120} />
-        <div className="m-auto w-60">
-          <Title />
-        </div>
-        <SizedBox height={20} />
+        <Title />
         <form
           className="flex flex-col justify-center space-y-10"
           onSubmit={type === SignInType.signIn ? login : signup}

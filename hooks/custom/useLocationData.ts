@@ -1,15 +1,16 @@
 import FirebaseHelper from "@/classes/FirebaseHelper";
-import { LocationData } from "@/classes/LocationData";
+import { Location } from "@/classes/Location";
+import { MyUser } from "@/classes/MyUser";
 import { useEffect, useState } from "react";
 
-export const useLocationData = (watch_id: string) => {
-  const [locationData, setLocationData] = useState<LocationData | null>(null);
+export const useLocation = (myUser: MyUser | null) => {
+  const [location, setLocation] = useState<Location | null>(null);
 
   useEffect(() => {
-    FirebaseHelper.getLocationData(watch_id).then((data) => {
-      setLocationData(data);
-    });
-  }, [watch_id]);
+    if (!myUser) return;
 
-  return locationData;
+    return FirebaseHelper.Location.watch(myUser.watch_id, setLocation);
+  }, [myUser]);
+
+  return location;
 };

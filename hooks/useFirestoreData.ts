@@ -5,7 +5,7 @@ import {
   setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { DependencyList, useEffect, useState } from "react";
 
 export type FirestoreDataType<T> = T & {
   updateData: (new_fields: Partial<T>) => Promise<void>;
@@ -23,9 +23,11 @@ export const convertTimestampsToDate = (input: any): any => {
 
 const useFirestoreData = <T>(
   dataDocRef: DocumentReference,
-  constructEmpty: () => T
-): FirestoreDataType<T> | null => {
-  const [data, setData] = useState<T | null>(constructEmpty);
+  constructEmpty: () => T,
+  dependencyList: DependencyList = []
+): [FirestoreDataType<T> | null, boolean] => {
+  const [data, setData] = useState<T | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const updateData = async (new_fields: Partial<T>) => {
     await updateDoc(dataDocRef, { ...new_fields });
@@ -40,15 +42,16 @@ const useFirestoreData = <T>(
       } else {
         setData(null);
       }
+      setIsLoading(false);
     });
     return () => unsub();
-  }, [dataDocRef]);
+  }, [...dependencyList]);
 
   if (data === null) {
-    return null;
+    return [null, isLoading];
   }
 
-  return { ...data, updateData };
+  return [{ ...data, updateData }, isLoading];
 };
 
 export default useFirestoreData;

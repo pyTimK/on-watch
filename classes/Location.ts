@@ -1,10 +1,10 @@
-export interface LocationData {
+export interface Location {
   latitude: string;
   longitude: string;
   emergency: string;
 }
 
-export const constructEmptyLocationData = (): LocationData => {
+export const constructEmptyLocation = (): Location => {
   return {
     latitude: "0",
     longitude: "0",

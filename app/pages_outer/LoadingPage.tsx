@@ -1,17 +1,21 @@
 import { Colors } from "@/styles/styles";
-import { useState } from "react";
+import React, { useState } from "react";
 import { RingLoader } from "react-spinners";
 
-const LoadingPage = () => {
-  const [loading, setLoading] = useState(true);
+interface LoadingPageProps {
+  hideIcon?: boolean;
+}
 
+const LoadingPage: React.FC<LoadingPageProps> = ({ hideIcon = false }) => {
   return (
     <div className="flex items-center justify-center h-screen">
-      <RingLoader
-        color={`${Colors.darker_primary}`}
-        loading={loading}
-        size={150}
-      />
+      {!hideIcon && (
+        <RingLoader
+          color={`${Colors.darker_primary}`}
+          loading={true}
+          size={150}
+        />
+      )}
     </div>
   );
 };

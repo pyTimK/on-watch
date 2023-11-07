@@ -31,7 +31,7 @@ const MyInput: React.FC<MyInputProps> = ({
           "w-full max-w-sm border rounded-lg bg-light_primary p-4",
           className,
           interFont,
-          error ? "border-red" : "border-darker_primary"
+          error ? "border-red" : "border-zinc-600"
         )}
         type={type}
         onChange={onChange}
