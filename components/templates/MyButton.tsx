@@ -11,7 +11,10 @@ interface MyButtonProps {
   pY?: number;
   disabled?: boolean;
   className?: string;
+  classNameBtn?: string;
   classNameText?: string;
+  outlined?: boolean;
+  dashed?: boolean;
 }
 
 const MyButton: React.FC<MyButtonProps> = ({
@@ -19,14 +22,22 @@ const MyButton: React.FC<MyButtonProps> = ({
   label,
   type,
   pX = 1.2,
-  pY = 0.7,
+  pY = 0.8,
   disabled,
   className,
+  classNameBtn,
   classNameText,
+  outlined = false,
+  dashed = false,
 }) => {
   return (
     <motion.div
-      className="text-center w-full rounded-lg bg-darker_primary m-auto shadow-none outline-none select-none"
+      className={twMerge(
+        "text-center w-full max-w-sm rounded-lg bg-darker_primary m-auto shadow-none outline-none select-none",
+        outlined && "bg-transparent border border-zinc-600",
+        dashed && "border-dashed",
+        className
+      )}
       onClick={onClick}
       whileTap={{ scale: disabled ? 1.0 : 0.8 }}
     >
@@ -35,13 +46,14 @@ const MyButton: React.FC<MyButtonProps> = ({
         disabled={disabled}
         className={twMerge(
           "m-auto min-w-full min-h-full rounded-lg",
-          className,
+          classNameBtn,
           disabled ? "cursor-default opacity-50" : "cursor-pointer opacity-100"
         )}
       >
         <p
           className={twMerge(
             "text-white font-light w-max m-auto",
+            outlined && "text-black",
             classNameText,
             jsoFont
           )}

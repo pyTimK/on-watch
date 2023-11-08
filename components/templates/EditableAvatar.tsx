@@ -1,12 +1,15 @@
-import { useState } from "react";
 import AvatarGirl from "../svg/icon/AvatarGirl";
 import EditRoundedIcon from "../svg/icon/EditRoundedIcon";
 
-interface EditableAvatarProps {}
+interface EditableAvatarProps {
+  selectedImage: File | null;
+  setSelectedImage: React.Dispatch<React.SetStateAction<File | null>>;
+}
 
-const EditableAvatar: React.FC<EditableAvatarProps> = ({}) => {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-
+const EditableAvatar: React.FC<EditableAvatarProps> = ({
+  selectedImage,
+  setSelectedImage,
+}) => {
   return (
     <div className="">
       <div className="w-min m-auto relative">

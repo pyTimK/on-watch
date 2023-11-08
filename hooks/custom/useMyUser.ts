@@ -10,8 +10,8 @@ export const useMyUser = (user: User | null): [MyUser | null, boolean] => {
   useEffect(() => {
     if (user) {
       setLoading(true);
-      FirebaseHelper.MyUser.get(user.uid).then((new_myUser) => {
-        setMyUser(new_myUser);
+      FirebaseHelper.MyUser.watch(user.uid, (data) => {
+        setMyUser(data);
         setLoading(false);
       });
     }

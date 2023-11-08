@@ -13,7 +13,7 @@ import {
 import { Location } from "./Location";
 import { MyUser, constructEmptyMyUserData } from "./MyUser";
 import { AdminBackendSettingsData } from "./AdminBackendSettingsData";
-import { ref } from "firebase/storage";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 abstract class FirebaseHelper {
   //!--- QUASAR
@@ -95,6 +95,18 @@ abstract class FirebaseHelper {
       }
     },
 
+    //! Watch
+    watch(id: string, callback: (data: MyUser | null) => void) {
+      const docRef = doc(db, "user", id);
+      return onSnapshot(docRef, (docSnap) => {
+        if (docSnap.exists()) {
+          callback(docSnap.data() as MyUser);
+        } else {
+          callback(null);
+        }
+      });
+    },
+
     //! Update
     async update(id: string, new_fields: Partial<MyUser>) {
       const docRef = doc(db, "user", id);
@@ -109,8 +121,19 @@ abstract class FirebaseHelper {
 
     Picture: {
       //! Create
-      async create() {
-        const ppRef = ref(storage, "profile_pics");
+      async create(uid: string, imgFile: File) {
+        const storageRef = ref(storage, `user/${uid}/profile_picture.jpg`);
+
+        await uploadBytes(storageRef, imgFile, {
+          contentType: "image/jpeg",
+        });
+      },
+
+      //! Get
+      async get(uid: string) {
+        const storageRef = ref(storage, `user/${uid}/profile_picture.jpg`);
+        const url = await getDownloadURL(storageRef);
+        return url;
       },
     },
   };
