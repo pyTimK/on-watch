@@ -1,5 +1,6 @@
 import AvatarGirl from "../svg/icon/AvatarGirl";
 import EditRoundedIcon from "../svg/icon/EditRoundedIcon";
+import Avatar from "./Avatar";
 
 interface EditableAvatarProps {
   selectedImage: File | null;
@@ -13,17 +14,9 @@ const EditableAvatar: React.FC<EditableAvatarProps> = ({
   return (
     <div className="">
       <div className="w-min m-auto relative">
-        <div className="w-28 h-28 rounded-full overflow-hidden">
-          {selectedImage ? (
-            <img
-              alt="not found"
-              width={"250px"}
-              src={URL.createObjectURL(selectedImage)}
-            />
-          ) : (
-            <AvatarGirl />
-          )}
-        </div>
+        <Avatar
+          src={selectedImage ? URL.createObjectURL(selectedImage) : undefined}
+        />
         <div className="absolute bottom-0 right-0">
           <label htmlFor="avatar-file-input" className="ml-4">
             <EditRoundedIcon />

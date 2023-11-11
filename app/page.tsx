@@ -15,6 +15,7 @@ import RegisterPage from "./pages/RegisterPage";
 import LoadingPage from "./pages_outer/LoadingPage";
 import SignInPage from "./pages_outer/SignInPage";
 import { createContext, useContext, useEffect, useState } from "react";
+import PageWrapper from "./pages/PageWrapper";
 
 export const LoadingContext = createContext({
   loading: false,
@@ -40,7 +41,7 @@ export default function Home() {
   );
 }
 
-const GlobalContext = createContext({
+export const GlobalContext = createContext({
   user: {} as User,
   myUser: {} as MyUser,
   location: {} as Location | null,
@@ -64,7 +65,7 @@ const Wrapper = () => {
   if (myUser === null) return <RegisterPage user={user} />;
   return (
     <GlobalContext.Provider value={{ user, myUser, location }}>
-      <MainPage />
+      <PageWrapper />
     </GlobalContext.Provider>
   );
 };

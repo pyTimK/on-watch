@@ -1,16 +1,23 @@
 import { motion } from "framer-motion";
 import { MouseEventHandler } from "react";
+import { twMerge } from "tailwind-merge";
 
 interface TitleProps {
   onClick?: MouseEventHandler<SVGSVGElement>;
+  size?: number;
+  withoutMargin?: boolean;
 }
 
-const Title: React.FC<TitleProps> = ({ onClick }) => (
-  <div className="m-auto w-60 mt-28 mb-12">
+const Title: React.FC<TitleProps> = ({
+  onClick,
+  size = 227,
+  withoutMargin = false,
+}) => (
+  <div className={twMerge("", !withoutMargin && "m-auto mt-28 mb-12 w-60")}>
     <motion.svg
       onClick={onClick}
       className="cursor-pointer"
-      width="227"
+      width={size}
       height="38"
       viewBox="0 0 227 38"
       fill="none"

@@ -1,7 +1,11 @@
-const MenuBarIcon: React.FC = () => (
+interface MenuBarIconProps {
+  size?: number;
+}
+
+const MenuBarIcon: React.FC<MenuBarIconProps> = ({ size = 25 }) => (
   <svg
-    width="33"
-    height="25"
+    width={`${size}px`}
+    height={`${size}px`}
     viewBox="0 0 33 25"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
