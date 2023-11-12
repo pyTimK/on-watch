@@ -6,6 +6,13 @@ import { createContext, useContext, useState } from "react";
 import MainPage from "../pages/MainPage";
 import { GlobalContext } from "./GlobalWrapper";
 import SettingsPage from "../pages/SettingsPage";
+import ProximityPage from "../pages/ProximityPage";
+import ProfilePage from "../pages/ProfilePage";
+import ContactsPage from "../pages/ContactsPage";
+import WatchPage from "../pages/WatchPage";
+import NotificationsPage from "../pages/NotificationsPage";
+import AboutPage from "../pages/AboutPage";
+import LocationBottomSheet from "@/components/custom/LocationBottomSheet";
 
 export const PageWrapperContext = createContext({
   page: Pages.Main,
@@ -17,7 +24,7 @@ export const enum Pages {
   Settings,
   Profile,
   Proximity,
-  Contact,
+  Contacts,
   Watch,
   Notifications,
   About,
@@ -52,19 +59,19 @@ const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         ) : page === Pages.Settings ? (
           <SettingsPage />
         ) : page === Pages.Profile ? (
-          <div>Profile</div>
+          <ProfilePage />
         ) : page === Pages.Proximity ? (
-          <div>Proximity</div>
-        ) : page === Pages.Contact ? (
-          <div>Contact</div>
+          <ProximityPage />
+        ) : page === Pages.Contacts ? (
+          <ContactsPage />
         ) : page === Pages.Watch ? (
-          <div>Watch</div>
+          <WatchPage />
         ) : page === Pages.Notifications ? (
-          <div>Notifications</div>
+          <NotificationsPage />
         ) : page === Pages.About ? (
-          <div>About</div>
+          <AboutPage />
         ) : (
-          <div>Page not found</div>
+          <div>404: Page not found</div>
         )}
       </div>
       <Footer divRef={sourceRef} />

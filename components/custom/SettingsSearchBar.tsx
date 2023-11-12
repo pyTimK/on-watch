@@ -17,7 +17,7 @@ const SettingsSearchBar: React.FC<SettingsSearchBarProps> = ({}) => {
       },
       {
         name: "Contact",
-        page: Pages.Contact,
+        page: Pages.Contacts,
       },
       {
         name: "Watch",

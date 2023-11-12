@@ -9,13 +9,15 @@ import {
 import Header from "@/components/custom/Header";
 import { GlobalContext } from "../wrappers/GlobalWrapper";
 import LocationBottomSheet from "@/components/custom/LocationBottomSheet";
+import { Colors } from "@/styles/styles";
 
 interface MainPageProps {}
 
 const MainPage: React.FC<MainPageProps> = ({}) => {
-  const { watch, myUser } = useContext(GlobalContext);
+  const { watch, proximity } = useContext(GlobalContext);
   const [marker, setMarker] = useState<any>();
   const [maps, setMaps] = useState<any>();
+  const [circle, setCircle] = useState<any>();
   const [openLocationBS, setOpenLocationBS] = useState(false);
 
   const [defaultCenter, setDefaultCenter] = useState({
@@ -23,6 +25,7 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
     lng: 121.00488,
   });
 
+  //! UPDATE MARKER POSITION
   useEffect(() => {
     if (marker && watch?.latitude && watch?.longitude) {
       const defaultCenter = {
@@ -34,6 +37,15 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
     }
   }, [marker, watch?.latitude, watch?.longitude]);
 
+  //! UPDATE CIRCLE POSITION
+  useEffect(() => {
+    if (circle && defaultCenter && proximity?.distance_limit_km) {
+      circle.setRadius(proximity.distance_limit_km);
+      circle.setCenter(defaultCenter);
+    }
+  }, [circle, proximity?.distance_limit_km, defaultCenter]);
+
+  //! UPDATE MARKER ICON
   useEffect(() => {
     if (marker && maps) {
       // console.log(marker);
@@ -44,22 +56,10 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
             : "/images/marker.svg",
         scaledSize: new maps.Size(40, 40), // scaled size
         origin: new maps.Point(0, 0), // origin
-        anchor: new maps.Point(0, 0), // anchor
+        anchor: new maps.Point(20, 20), // anchor
       });
     }
   }, [marker, maps, watch?.emergency]);
-
-  // useLayoutEffect(() => {
-  //   if (typeof window !== "undefined") {
-  //     //get an image with src="aa.png"
-  //     const imgEl = document.querySelector("img[src='/images/marker.svg']");
-  //     console.log("imgEl");
-  //     console.log(imgEl);
-  //     if (!imgEl) return;
-  //     const parentEl = imgEl.parentElement;
-  //     parentEl?.classList.add("my-pulse");
-  //   }
-  // }, [marker]);
 
   return (
     <div
@@ -80,26 +80,18 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
         yesIWantToUseGoogleMapApiInternals
         onGoogleApiLoaded={({ map, maps }) => {
           setMaps(maps);
-          // const bounds = new maps.LatLngBounds();
-          // bounds.extend(centerCoordinates);
-          // bounds.extend(deviceCoordinates);
-          // map.fitBounds(bounds);
-          // new maps.Circle({
-          //   strokeColor: Colors.darker_primary,
-          //   strokeOpacity: 0.8,
-          //   strokeWeight: 2,
-          //   fillColor: Colors.light_primary,
-          //   fillOpacity: 0.3,
-          //   map,
-          //   center: { lat: readingData.geo_lat, lng: readingData.geo_long },
-          //   radius: readingData.geo_radius,
-          // });
-          // Add on click listener
-          // new maps.event.addListener(map, "click", (event: any) => {
-          //   // addMarker(event.latLng, map, maps);
-          //   console.log(event.latLng.lat(), event.latLng.lng());
-          // });
-          // Display barangay markers
+
+          const new_circle = new maps.Circle({
+            strokeColor: Colors.darker_primary,
+            strokeOpacity: 0.4,
+            strokeWeight: 2,
+            fillColor: Colors.light_primary,
+            fillOpacity: 0,
+            map,
+            center: defaultCenter,
+            radius: proximity?.distance_limit_km,
+          });
+          setCircle(new_circle);
 
           const new_marker = new maps.Marker({
             position: { lat: defaultCenter.lat, lng: defaultCenter.lng },
@@ -109,14 +101,14 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
               url: "/images/marker.svg", // url
               scaledSize: new maps.Size(40, 40), // scaled size
               origin: new maps.Point(0, 0), // origin
-              anchor: new maps.Point(0, 0), // anchor
+              anchor: new maps.Point(20, 20), // anchor
             },
             clickable: true,
           });
           setMarker(new_marker);
 
           maps.event.addDomListener(new_marker, "click", function () {
-            setOpenLocationBS(!openLocationBS);
+            setOpenLocationBS((open) => !open);
           });
           // console.log(`New Marker: ${defaultCetner}`);
           // new maps.Marker({
@@ -134,6 +126,9 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
       </GoogleMapReact>
       <LocationBottomSheet
         open={openLocationBS}
+        lat={defaultCenter.lat}
+        lng={defaultCenter.lng}
+        title={watch !== null ? `${watch?.name}'s Position` : "Position"}
         onClose={() => setOpenLocationBS(false)}
       />
     </div>

@@ -318,7 +318,10 @@ var BottomSheet = function (_a) {
     )
   );
 };
-var ModifiedBottomSheet = memo(BottomSheet);
 
+// var ModifiedMottomSheet = BottomSheet;
+// export default ModifiedMottomSheet;
+
+var ModifiedBottomSheet = memo(BottomSheet);
 export default ModifiedBottomSheet;
 //# sourceMappingURL=index.js.map

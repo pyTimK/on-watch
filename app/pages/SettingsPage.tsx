@@ -11,7 +11,6 @@ import Avatar from "@/components/templates/Avatar";
 import MyButton from "@/components/templates/MyButton";
 import MyInput from "@/components/templates/MyInput";
 import { useInputField } from "@/hooks/useInputField";
-import useMyInput from "@/hooks/useMyInput";
 import {
   Dispatch,
   SetStateAction,
@@ -23,6 +22,7 @@ import {
 import Modal from "react-modal";
 import { GlobalContext } from "../wrappers/GlobalWrapper";
 import { PageWrapperContext, Pages } from "../wrappers/PageWrapper";
+import HeaderSettings from "@/components/custom/HeaderSettings";
 
 const SettingsPageContext = createContext({});
 
@@ -58,11 +58,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({}) => {
     <SettingsPageContext.Provider value={{}}>
       <div className="px-5 pt-1">
         {/* //! HEADER */}
-        <div className="flex justify-between items-center">
-          <BackAndroidIcon size={25} />
-          <p className="font-semibold">Settings</p>
-          <BackAndroidIcon size={25} hidden />
-        </div>
+        <HeaderSettings title="Settings" />
 
         {/* //! SEARCH BAR */}
         <SettingsSearchBar />
@@ -79,7 +75,7 @@ const SettingsPage: React.FC<SettingsPageProps> = ({}) => {
 
         {/* //! SETTINGS */}
         <SettingsBlock title="Settings">
-          <SettingsRow title="Contact" onClick={() => setPage(Pages.Contact)}>
+          <SettingsRow title="Contact" onClick={() => setPage(Pages.Contacts)}>
             <ProfileOutlinedIcon />
           </SettingsRow>
           <SettingsRow
@@ -119,7 +115,7 @@ const SettingsBlock: React.FC<SettingsBlockProps> = ({ title, children }) => {
 
 interface SettingsRowProps {
   children: React.ReactNode;
-  title: string;
+  title?: string;
   onClick?: () => void;
 }
 

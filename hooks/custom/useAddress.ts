@@ -20,15 +20,15 @@ setDefaults({
 } as GeocodeOptions);
 
 export const useAddress = (
-  lat: string | undefined,
-  lng: string | undefined
+  lat: number | undefined,
+  lng: number | undefined
 ): string | null => {
   const [address, setAddress] = useState<string | null>(null);
 
   useEffect(() => {
     if (lat && lng) {
       // Get address from latitude & longitude.
-      fromLatLng(parseFloat(lat), parseFloat(lng))
+      fromLatLng(lat, lng)
         .then(({ results }) => {
           if (!results || results.length === 0) return;
 

@@ -19,7 +19,10 @@ const EmergencyBottomSheet: React.FC<EmergencyBottomSheetProps> = ({
 }) => {
   const { watch } = useContext(GlobalContext);
 
-  const address = useAddress(watch?.latitude, watch?.longitude);
+  const address = useAddress(
+    parseFloat(watch?.latitude ?? "0"),
+    parseFloat(watch?.longitude ?? "0")
+  );
 
   return (
     <MyBottomSheet open={open} onClose={onClose}>
