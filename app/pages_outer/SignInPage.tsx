@@ -4,22 +4,18 @@ import MyButton from "@/components/templates/MyButton";
 import MyInput from "@/components/templates/MyInput";
 import SizedBox from "@/components/templates/SizedBox";
 import useSignInPage, { SignInType } from "@/hooks/useSignIn";
-import { interFont, jsoFont } from "@/styles/fonts";
+import { interFont } from "@/styles/fonts";
 import { useState } from "react";
 
 const SignInPage: React.FC = () => {
   const {
     type,
-    emailRef,
-    passwordRef,
-    errorEmailInput,
-    setErrorEmailInput,
-    errorPasswordInput,
-    setErrorPasswordInput,
     toggleType,
     login,
     signup,
     forgotPassword,
+    emailInput,
+    passwordInput,
   } = useSignInPage();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -36,19 +32,15 @@ const SignInPage: React.FC = () => {
         >
           <MyInput
             placeholder="Email"
+            inputField={emailInput}
             className="bg-transparent"
-            error={errorEmailInput}
-            innerRef={emailRef}
-            onChange={() => setErrorEmailInput(false)}
           />
           <div className="relative">
             <MyInput
               placeholder="Password"
               className="bg-transparent"
               type={showPassword ? "text" : "password"}
-              error={errorPasswordInput}
-              innerRef={passwordRef}
-              onChange={() => setErrorPasswordInput(false)}
+              inputField={passwordInput}
             />
             <div className="w-6 h-6 absolute right-3 top-1/2 -translate-y-1/2">
               <VisibilityIcon

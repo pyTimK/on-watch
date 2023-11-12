@@ -10,10 +10,11 @@ import {
   updateDoc,
   writeBatch,
 } from "firebase/firestore";
-import { Location } from "./Location";
+import { Watch } from "./Watch";
 import { MyUser, constructEmptyMyUserData } from "./MyUser";
 import { AdminBackendSettingsData } from "./AdminBackendSettingsData";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { timestampsToDate } from "@/myfunctions/timestampToDate";
 
 abstract class FirebaseHelper {
   //!--- QUASAR
@@ -30,26 +31,28 @@ abstract class FirebaseHelper {
       });
     },
   };
-  //!--- LOCATION
-  static Location = {
+  //!--- WATCH
+  static Watch = {
     //! Get
     async get(id: string) {
       if (!id) return null;
       const docRef = doc(db, "location", id);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        return docSnap.data() as Location;
+        const dataWithConvertedDates = timestampsToDate(docSnap.data());
+        return dataWithConvertedDates as Watch;
       } else {
         return null;
       }
     },
 
     //! Watch
-    watch(id: string, callback: (data: Location | null) => void) {
+    watch(id: string, callback: (data: Watch | null) => void) {
       const docRef = doc(db, "location", id);
       return onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
-          callback(docSnap.data() as Location);
+          const dataWithConvertedDates = timestampsToDate(docSnap.data());
+          callback(dataWithConvertedDates as Watch);
         } else {
           callback(null);
         }
@@ -57,7 +60,7 @@ abstract class FirebaseHelper {
     },
 
     //! Update
-    async update(id: string, new_fields: Partial<Location>) {
+    async update(id: string, new_fields: Partial<Watch>) {
       const docRef = doc(db, "location", id);
       await updateDoc(docRef, { ...new_fields });
     },

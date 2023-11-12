@@ -115,3 +115,43 @@ input[type=number] {
 .CSVImporter_ProgressDisplay__count::after {
   content: " rows imported";
 }
+
+
+/*! PULSE  */
+.my-pulse {
+  animation: pulse-animation 2s infinite;
+  border-radius: 50%;
+}
+
+div:has(> img[src='/images/marker.svg']) {
+  animation: pulse-animation 2s infinite;
+  border-radius: 50%;
+}
+
+div:has(> img[src='/images/redmarker.svg']) {
+  animation: red-pulse-animation 2s infinite;
+  border-radius: 50%;
+}
+
+/* div[style*='width: 40px;'][style*='height: 40px;'][style*='overflow: hidden;'][style*='position: absolute;'][style*='z-index: '] {
+  animation: pulse-animation 2s infinite;
+  border-radius: 50%;
+} */
+
+@keyframes pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0px rgb(42, 183, 183, 0.6)
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(42, 183, 183, 0);
+  }
+}
+
+@keyframes red-pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0px rgba(235, 30, 57, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(235, 30, 57, 0);
+  }
+}

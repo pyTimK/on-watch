@@ -30,11 +30,7 @@ const AnimatedDrawingBorder: React.FC<AnimatedDrawingBorderProps> = ({
       setSvgWidth(labelRef.current.clientWidth + px * 2);
       setSvgHeight(labelRef.current.clientHeight + py * 2);
     }
-  }, [
-    labelRef.current,
-    labelRef.current?.clientWidth,
-    labelRef.current?.clientHeight,
-  ]);
+  }, [labelRef.current?.clientWidth, labelRef.current?.clientHeight, px, py]);
 
   const _rectStartingStrokeWidth = svgWidth + svgHeight - rectStartingWidth;
   const _rectEndingWidth = svgWidth + svgHeight;

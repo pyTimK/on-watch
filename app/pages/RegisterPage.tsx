@@ -14,8 +14,8 @@ import useModal from "@/hooks/useModal";
 import { User } from "firebase/auth";
 import { FormEventHandler, useContext, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import { LoadingContext } from "../page";
 import notify from "@/myfunctions/notify";
+import { LoadingContext } from "../wrappers/LoadingWrapper";
 
 interface RegisterPageProps {
   user: User;

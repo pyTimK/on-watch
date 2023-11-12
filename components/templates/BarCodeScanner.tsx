@@ -17,7 +17,7 @@ const BarcodeScanner: React.FC<BarCodeScannerProps> = ({ onScan }) => {
     if (result) {
       onScan(result);
     }
-  }, [result]);
+  }, [result, onScan]);
 
   return (
     <>

@@ -1,3 +1,4 @@
+import { timestampsToDate } from "@/myfunctions/timestampToDate";
 import {
   DocumentReference,
   Timestamp,
@@ -9,16 +10,6 @@ import { DependencyList, useEffect, useState } from "react";
 
 export type FirestoreDataType<T> = T & {
   updateData: (new_fields: Partial<T>) => Promise<void>;
-};
-
-export const convertTimestampsToDate = (input: any): any => {
-  const output = { ...input };
-  for (const key in output) {
-    if (output[key] instanceof Timestamp) {
-      output[key] = output[key].toDate(); // Converts Timestamp to Date
-    }
-  }
-  return output;
 };
 
 const useFirestoreData = <T>(
@@ -37,7 +28,7 @@ const useFirestoreData = <T>(
     const unsub = onSnapshot(dataDocRef, (doc) => {
       if (doc.exists()) {
         let rawData = doc.data();
-        const dataWithConvertedDates = convertTimestampsToDate(rawData);
+        const dataWithConvertedDates = timestampsToDate(rawData);
         setData((dataWithConvertedDates as T) ?? null);
       } else {
         setData(null);

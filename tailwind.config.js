@@ -21,7 +21,7 @@ module.exports = {
         link: "#15233D",
 
         // custom
-        bg: "#F7F7F7",
+        bg: "#F6F6F6",
         white: "#FFFFFF",
         red: "#EB1C36",
         red_bg: "#EC354B",

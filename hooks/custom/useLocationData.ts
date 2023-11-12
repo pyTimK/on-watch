@@ -1,16 +1,16 @@
 import FirebaseHelper from "@/classes/FirebaseHelper";
-import { Location } from "@/classes/Location";
+import { Watch } from "@/classes/Watch";
 import { MyUser } from "@/classes/MyUser";
 import { useEffect, useState } from "react";
 
-export const useLocation = (myUser: MyUser | null) => {
-  const [location, setLocation] = useState<Location | null>(null);
+export const useWatch = (myUser: MyUser | null) => {
+  const [watch, setWatch] = useState<Watch | null>(null);
 
   useEffect(() => {
     if (!myUser) return;
 
-    return FirebaseHelper.Location.watch(myUser.watch_id, setLocation);
+    return FirebaseHelper.Watch.watch(myUser.watch_id, setWatch);
   }, [myUser]);
 
-  return location;
+  return watch;
 };

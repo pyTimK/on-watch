@@ -1,11 +1,16 @@
+import { motion } from "framer-motion";
+
 interface MenuBarIconProps {
   size?: number;
+  onClick?: () => void;
 }
 
-const MenuBarIcon: React.FC<MenuBarIconProps> = ({ size = 25 }) => (
-  <svg
+const MenuBarIcon: React.FC<MenuBarIconProps> = ({ size = 25, onClick }) => (
+  <motion.svg
     width={`${size}px`}
     height={`${size}px`}
+    whileTap={{ scale: 0.8 }}
+    onClick={onClick}
     viewBox="0 0 33 25"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
@@ -17,7 +22,7 @@ const MenuBarIcon: React.FC<MenuBarIconProps> = ({ size = 25 }) => (
       strokeLinecap="round"
       strokeLinejoin="round"
     />
-  </svg>
+  </motion.svg>
 );
 
 export default MenuBarIcon;

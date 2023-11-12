@@ -1,5 +1,4 @@
 import { auth } from "@/app/firebase";
-import { PagesWrapperContext } from "@/app/pages/PagesWrapper";
 import isValidEmail from "@/myfunctions/is_valid_email";
 import notify from "@/myfunctions/notify";
 import {
@@ -14,51 +13,32 @@ import {
   useRef,
   useState,
 } from "react";
+import { useInputField } from "./useInputField";
 
 function useSignInPage() {
   const [type, setType] = useState(SignInType.signIn);
-  const emailRef = useRef<HTMLInputElement>(null);
-  const passwordRef = useRef<HTMLInputElement>(null);
-  const [errorEmailInput, setErrorEmailInput] = useState(false);
-  const [errorPasswordInput, setErrorPasswordInput] = useState(false);
+  const emailInput = useInputField((email) => [
+    [!email, "Please Enter your full name"],
+    [!isValidEmail(email!), "Invalid Email"],
+  ]);
+
+  const passwordInput = useInputField((password) => [
+    [!password, "Please Enter a Password"],
+    [password!.length < 6, "Password should be at least 6 characters long"],
+  ]);
 
   function toggleType() {
     setType(type === SignInType.signIn ? SignInType.logIn : SignInType.signIn);
   }
 
-  const verifyEmail = (email: string | undefined) => {
-    if (!email) {
-      notify("Please Enter your Email");
-      setErrorEmailInput(true);
-      return false;
-    }
-
-    if (!isValidEmail(email)) {
-      notify("Invalid Email");
-      setErrorEmailInput(true);
-      return false;
-    }
-
-    return true;
-  };
-
-  const verifyPassword = (password: string | undefined) => {
-    if (!password) {
-      notify("Please Enter a Password");
-      setErrorPasswordInput(true);
-      return false;
-    }
-
-    return true;
-  };
-
   const login: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    const email = emailRef.current?.value;
-    const password = passwordRef.current?.value;
 
-    if (!verifyEmail(email)) return;
-    if (!verifyPassword(password)) return;
+    if (!emailInput.verify()) return;
+    if (!passwordInput.verify()) return;
+
+    const email = emailInput.getValue()!;
+    const password = passwordInput.getValue()!;
 
     signInWithEmailAndPassword(auth, email!, password!)
       .then((userCredential) => {
@@ -73,23 +53,23 @@ function useSignInPage() {
 
         if (errorCode === "auth/weak-password") {
           notify("Password should be at least 6 characters long");
-          setErrorPasswordInput(true);
+          passwordInput.setError(true);
           return;
         }
         notify("Invalid Email or Password");
-        setErrorEmailInput(true);
-        setErrorPasswordInput(true);
+        emailInput.setError(true);
+        passwordInput.setError(true);
       });
   };
 
   const signup: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
-    const email = emailRef.current?.value;
-    const password = passwordRef.current?.value;
+    if (!emailInput.verify()) return;
+    if (!passwordInput.verify()) return;
 
-    if (!verifyEmail(email)) return;
-    if (!verifyPassword(password)) return;
+    const email = emailInput.getValue()!;
+    const password = passwordInput.getValue()!;
 
     createUserWithEmailAndPassword(auth, email!, password!)
       .then((userCredential) => {
@@ -103,20 +83,20 @@ function useSignInPage() {
 
         if (errorCode === "auth/weak-password") {
           notify("Password should be at least 6 characters long");
-          setErrorPasswordInput(true);
+          passwordInput.setError(true);
           return;
         }
         notify("Invalid Email or Password");
-        setErrorEmailInput(true);
-        setErrorPasswordInput(true);
+        emailInput.setError(true);
+        passwordInput.setError(true);
       });
   };
 
   const forgotPassword: MouseEventHandler<HTMLParagraphElement> = (e) => {
     e.preventDefault();
 
-    const email = emailRef.current?.value;
-    if (!verifyEmail(email)) return;
+    if (!emailInput.verify()) return;
+    const email = emailInput.getValue()!;
 
     sendPasswordResetEmail(auth, email!)
       .then(() => {
@@ -134,19 +114,12 @@ function useSignInPage() {
 
   return {
     type,
-    setType,
-    emailRef,
-    passwordRef,
-    errorEmailInput,
-    setErrorEmailInput,
-    errorPasswordInput,
-    setErrorPasswordInput,
     toggleType,
-    verifyEmail,
-    verifyPassword,
     login,
     signup,
     forgotPassword,
+    emailInput,
+    passwordInput,
   };
 }
 

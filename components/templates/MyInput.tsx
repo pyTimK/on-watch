@@ -10,7 +10,10 @@ interface MyInputProps {
   onChange?: ChangeEventHandler<HTMLInputElement>;
   dark?: boolean;
   className?: string;
+  divClassName?: string;
   defaultValue?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
 }
 
 const MyInput: React.FC<MyInputProps> = ({
@@ -19,18 +22,21 @@ const MyInput: React.FC<MyInputProps> = ({
   inputField,
   onChange,
   className,
+  divClassName,
   defaultValue,
+  onFocus,
+  onBlur,
 }) => {
   return (
-    <div className="flex justify-center">
+    <div className={twMerge("flex justify-center", divClassName)}>
       <input
         ref={inputField.ref}
         step="any"
         className={twMerge(
           "w-full max-w-sm border rounded-lg bg-light_primary p-4",
-          className,
           interFont,
-          inputField.error ? "border-red" : "border-zinc-600"
+          inputField.error ? "border-red" : "border-zinc-600",
+          className
         )}
         type={type}
         onChange={(e) => {
@@ -39,6 +45,8 @@ const MyInput: React.FC<MyInputProps> = ({
           }
           inputField.setError(false);
         }}
+        onFocus={onFocus}
+        onBlur={onBlur}
         placeholder={placeholder}
         defaultValue={defaultValue}
       ></input>
