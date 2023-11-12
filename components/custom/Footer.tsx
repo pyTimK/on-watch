@@ -12,7 +12,7 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ divRef }) => {
-  const { page, setPage } = useContext(PageWrapperContext);
+  const { page, setPage, setCallBSOpen } = useContext(PageWrapperContext);
   return (
     <div
       ref={divRef}
@@ -25,7 +25,7 @@ const Footer: React.FC<FooterProps> = ({ divRef }) => {
         <PinOutlinedIcon size={30} selected={page === Pages.Main} />
       </FooterIcon>
       <div className="flex flex-col items-center -translate-y-3">
-        <RedPhoneIcon onClick={() => console.log("PHOEEEE")} />
+        <RedPhoneIcon onClick={() => setCallBSOpen((open) => !open)} />
         <p className="text-xs font-semibold text-zinc-800">Call</p>
       </div>
       <FooterIcon title="Alarm" page={Pages.Proximity}>

@@ -27,15 +27,17 @@ const SignInPage: React.FC = () => {
       >
         <Title />
         <form
-          className="flex flex-col justify-center space-y-10"
+          className="flex flex-col w-full justify-center items-center space-y-10"
           onSubmit={type === SignInType.signIn ? login : signup}
         >
-          <MyInput
-            placeholder="Email"
-            inputField={emailInput}
-            className="bg-transparent"
-          />
-          <div className="relative">
+          <div className="w-full">
+            <MyInput
+              placeholder="Email"
+              inputField={emailInput}
+              className="bg-transparent"
+            />
+          </div>
+          <div className="relative w-full max-w-sm">
             <MyInput
               placeholder="Password"
               className="bg-transparent"

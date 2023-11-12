@@ -12,10 +12,11 @@ import { useQr } from "@/hooks/custom/useQR";
 import { useCheckboxField, useInputField } from "@/hooks/useInputField";
 import useModal from "@/hooks/useModal";
 import { User } from "firebase/auth";
-import { FormEventHandler, useContext, useState } from "react";
+import { FormEventHandler, useContext, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import notify from "@/myfunctions/notify";
 import { LoadingContext } from "../wrappers/LoadingWrapper";
+import { Proximity } from "@/classes/Proximity";
 
 interface RegisterPageProps {
   user: User;
@@ -23,7 +24,6 @@ interface RegisterPageProps {
 
 const RegisterPage: React.FC<RegisterPageProps> = ({ user }) => {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const { setLoading } = useContext(LoadingContext);
 
   const nameInput = useInputField((name) => [
     [!name, "Please Enter your full name"],
@@ -40,6 +40,15 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ user }) => {
 
   const { isModalOpen, openModal, closeModal } = useModal();
   const { qr, isValidQr, verifyQR, errorQrInput, onQrScan } = useQr(closeModal);
+  const [verifiedNotified, setVerifiedNotified] = useState(false);
+
+  //! DEVICE VERIFIED
+  useEffect(() => {
+    if (qr && isValidQr && !verifiedNotified) {
+      notify("Device verified", { type: "success" });
+      setVerifiedNotified(true);
+    }
+  }, [qr, isValidQr, verifyQR]);
 
   //! REGISTER
   const register: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -67,8 +76,11 @@ const RegisterPage: React.FC<RegisterPageProps> = ({ user }) => {
         photoURL: photoURL,
         watch_id: qr,
         watch_ids: [qr],
+        contact_ids: [],
+        emergency_notif: true,
       };
 
+      //! Create MyUser
       await FirebaseHelper.MyUser.create(myUser);
     } catch (error) {
       console.log(error);

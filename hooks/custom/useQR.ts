@@ -11,7 +11,6 @@ export const useQr = (closeModal: () => void) => {
   const onQrScan = (result: string) => {
     setQr(result);
     if (Constants.validDeviceIds.includes(result)) {
-      notify("Device verified", { type: "success" });
       closeModal();
       setIsValidQR(true);
       setErrorQrInput(false);
@@ -31,5 +30,5 @@ export const useQr = (closeModal: () => void) => {
     return true;
   };
 
-  return { qr, isValidQr, verifyQR, errorQrInput, onQrScan };
+  return { qr, isValidQr, verifyQR, setIsValidQR, errorQrInput, onQrScan };
 };

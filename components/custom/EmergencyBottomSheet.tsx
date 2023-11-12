@@ -47,7 +47,7 @@ const EmergencyBottomSheet: React.FC<EmergencyBottomSheetProps> = ({
           </p>
         </div>
 
-        {/*//! Need Help */}
+        {/*//! Call Police */}
         <div className="flex justify-between w-full mt-10 mb-8">
           <div className="flex flex-col gap-1">
             <p className="text-xs text-zinc-400">Phone Number</p>

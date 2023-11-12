@@ -1,7 +1,7 @@
 /**
  * Calculates the haversine distance between point A, and B.
  */
-const haversineDistance = (
+const haversineDistanceKm = (
   lat1: number,
   lon1: number,
   lat2: number,
@@ -33,4 +33,4 @@ const haversineDistance = (
   return finalDistance;
 };
 
-export default haversineDistance;
+export default haversineDistanceKm;

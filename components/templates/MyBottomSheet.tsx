@@ -14,7 +14,24 @@ const MyBottomSheet: React.FC<MyBottomSheetProps> = ({
 }) => {
   return (
     <ModifiedBottomSheet
-      classNames={{ draggable: "rounded-t-3xl" }}
+      classNames={{
+        draggable: "rounded-t-3xl",
+        dragIndicator: {
+          wrap: "rounded-t-3xl",
+        },
+      }}
+      styles={{
+        dragIndicator: {
+          wrap: {
+            backgroundColor: "#F6F6F6",
+          },
+        },
+        window: {
+          content: {
+            backgroundColor: "#F6F6F6",
+          },
+        },
+      }}
       isOpen={open}
       close={() => {
         if (onClose) {

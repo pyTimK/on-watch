@@ -17,39 +17,46 @@ const ProximityPage: React.FC<ProximityPageProps> = ({}) => {
   const { proximity } = useContext(GlobalContext);
   const [marker, setMarker] = useState<any>();
   const [circle, setCircle] = useState<any>();
-  const [center, setCenter] = useState({
+  const [centerCircle, setCenterCircle] = useState({
     lat: 14.610535,
     lng: 121.00488,
   });
 
   const distanceInput = useInputField((distance) => [
-    [!distance, "Distance is required"],
-    [parseFloat(distance!) <= 0, "Distance must be greater than 0 km"],
-    [parseFloat(distance!) > 100000, "Distance must be less than 100, 000 km"],
+    [
+      distance !== undefined && parseFloat(distance!) <= 0,
+      "Distance must be greater than 0 km",
+    ],
+    [
+      distance !== undefined && parseFloat(distance!) > 100000,
+      "Distance must be less than 100, 000 km",
+    ],
   ]);
 
-  //! UPDATE MARKER POSITION
+  //! UPDATE CIRCLE MARKER POSITION
   useEffect(() => {
     if (marker && proximity?.lat && proximity?.lng) {
       const center = { lat: proximity.lat, lng: proximity.lng };
-      setCenter(center);
+      setCenterCircle(center);
       marker.setPosition(center);
     }
   }, [marker, proximity?.lat, proximity?.lng]);
 
   //! UPDATE CIRCLE POSITION
   useEffect(() => {
-    if (circle && center && proximity?.distance_limit_km) {
-      circle.setRadius(proximity.distance_limit_km);
-      circle.setCenter(center);
+    if (circle && centerCircle && proximity?.distance_limit_m) {
+      circle.setRadius(proximity.distance_limit_m);
+      circle.setCenter(centerCircle);
     }
-  }, [circle, proximity?.distance_limit_km, center]);
+  }, [circle, proximity?.distance_limit_m, centerCircle]);
 
   //! DISTANCE LIMIT UPDATE
   const updateDistanceLimit = () => {
     if (distanceInput.verify()) {
+      const value = distanceInput.getValue();
+      if (!value) return;
       FirebaseHelper.Proximity.update(proximity, {
-        distance_limit_km: parseFloat(distanceInput.getValue()!),
+        distance_limit_m: parseFloat(value),
       });
     }
   };
@@ -79,12 +86,12 @@ const ProximityPage: React.FC<ProximityPageProps> = ({}) => {
               <MyInput
                 type="number"
                 inputField={distanceInput}
-                defaultValue={`${proximity?.distance_limit_km}`}
+                defaultValue={`${proximity?.distance_limit_m}`}
                 className="w-24 text-end bg-transparent py-1 px-1"
                 onBlur={updateDistanceLimit}
                 onChange={updateDistanceLimit}
               />
-              <p className="text-sm">km</p>
+              <p className="text-sm">m</p>
             </div>
           </SettingsRow>
         </SettingsBlock>
@@ -101,8 +108,8 @@ const ProximityPage: React.FC<ProximityPageProps> = ({}) => {
             key: "AIzaSyAzPN7p1Nx8VgwDWN7QmheKnvAI4Bov-X8",
           }}
           defaultCenter={{ lat: 14.610535, lng: 121.00488 }}
-          center={center}
-          defaultZoom={15}
+          center={centerCircle}
+          defaultZoom={12}
           style={{ width: "100%", height: "100%", position: "relative" }}
           yesIWantToUseGoogleMapApiInternals
           onGoogleApiLoaded={({ map, maps }) => {
@@ -117,8 +124,8 @@ const ProximityPage: React.FC<ProximityPageProps> = ({}) => {
               fillColor: Colors.light_primary,
               fillOpacity: 0.3,
               map,
-              center: center,
-              radius: proximity?.distance_limit_km,
+              center: centerCircle,
+              radius: proximity?.distance_limit_m,
             });
             setCircle(new_circle);
             // Add on click listener
@@ -129,7 +136,7 @@ const ProximityPage: React.FC<ProximityPageProps> = ({}) => {
             // Display barangay markers
 
             const new_marker = new maps.Marker({
-              position: center,
+              position: centerCircle,
               map,
               icon: {
                 url: "/images/center_marker.svg", // url
@@ -144,7 +151,7 @@ const ProximityPage: React.FC<ProximityPageProps> = ({}) => {
 
             //! On click Marker
             maps.event.addDomListener(new_marker, "click", function () {
-              setOpenLocationBS(!openLocationBS);
+              setOpenLocationBS((open) => !open);
             });
 
             //! On drag end Marker
@@ -176,8 +183,8 @@ const ProximityPage: React.FC<ProximityPageProps> = ({}) => {
       </div>
       <LocationBottomSheet
         open={openLocationBS}
-        lat={center.lat}
-        lng={center.lng}
+        lat={centerCircle.lat}
+        lng={centerCircle.lng}
         title="Center Position"
         onClose={() => setOpenLocationBS(false)}
       />

@@ -6,6 +6,8 @@ export interface MyUser {
   phone: string;
   watch_id: string;
   watch_ids: string[];
+  contact_ids: string[];
+  emergency_notif: boolean;
 }
 
 export const constructEmptyMyUserData = (): MyUser => {
@@ -17,5 +19,7 @@ export const constructEmptyMyUserData = (): MyUser => {
     phone: "",
     watch_id: "",
     watch_ids: [],
-  };
+    contact_ids: [],
+    emergency_notif: false,
+  } as MyUser;
 };

@@ -6,6 +6,7 @@ export type InputField = {
   error: boolean;
   setError: React.Dispatch<React.SetStateAction<boolean>>;
   verify: () => boolean;
+  setValue: (value: string | undefined) => void;
   getValue: () => string | undefined;
 };
 
@@ -28,8 +29,12 @@ export const useInputField = (
   };
 
   const getValue = () => inputRef.current?.value;
+  const setValue = (value: string | undefined) => {
+    if (inputRef.current == null || !value) return;
+    inputRef.current.value = value;
+  };
 
-  return { ref: inputRef, error, setError, verify, getValue };
+  return { ref: inputRef, error, setError, verify, getValue, setValue };
 };
 
 export const useCheckboxField = (unCheckedMessage: string) => {

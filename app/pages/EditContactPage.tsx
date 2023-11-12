@@ -1,79 +1,77 @@
+import FirebaseHelper from "@/classes/FirebaseHelper";
 import BackAndroidIcon from "@/components/svg/icon/BackAndroidIcon";
-import Avatar from "@/components/templates/Avatar";
+import EditableAvatar from "@/components/templates/EditableAvatar";
+import MyButton from "@/components/templates/MyButton";
+import MyInput from "@/components/templates/MyInput";
+import { useInputField } from "@/hooks/useInputField";
+import notify from "@/myfunctions/notify";
 import { FormEventHandler, useContext, useEffect, useState } from "react";
 import { PageWrapperContext, Pages } from "../wrappers/PageWrapper";
-import EditableAvatar from "@/components/templates/EditableAvatar";
-import { useInputField } from "@/hooks/useInputField";
-import FirebaseHelper from "@/classes/FirebaseHelper";
-import notify from "@/myfunctions/notify";
-import { GlobalContext } from "../wrappers/GlobalWrapper";
-import { MyUser } from "@/classes/MyUser";
-import MyInput from "@/components/templates/MyInput";
-import MyButton from "@/components/templates/MyButton";
-import { auth } from "../firebase";
-import { signOut } from "firebase/auth";
+import { Contact } from "@/classes/Contact";
 
-interface ProfilePageProps {}
+interface EditContactPageProps {}
 
-const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
-  const { myUser } = useContext(GlobalContext);
-  const { setPage } = useContext(PageWrapperContext);
+const EditContactPage: React.FC<EditContactPageProps> = ({}) => {
+  const { editContact, setPage } = useContext(PageWrapperContext);
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const nameInput = useInputField((name) => [
-    [!name, "Please Enter your name"],
+    [!name, "Please Enter the contact's name"],
   ]);
 
   const phoneInput = useInputField((phone) => [
-    [!phone, "Please Enter your phone number"],
+    [!phone, "Please Enter the contact's phone number"],
     [!/^[0-9+]*$/.test(phone!), "Phone number must only contain digits or '+'"],
   ]);
 
   const [photoURLUpdated, setPhotoURLUpdated] = useState(false);
   const [nameUpdated, setNameUpdated] = useState(false);
   const [phoneUpdated, setPhoneUpdated] = useState(false);
-  const [updatingMyUser, setUpdatingMyUser] = useState(false);
+  const [updatingContact, setUpdatingContact] = useState(false);
 
   const hasUpdates = photoURLUpdated || nameUpdated || phoneUpdated;
 
   //! INITIALIZE FIELDS
   useEffect(() => {
-    if (!myUser) return;
-    nameInput.setValue(myUser.name);
-    phoneInput.setValue(myUser.phone);
-  }, [myUser]);
+    if (!editContact) return;
+    nameInput.setValue(editContact.name);
+    phoneInput.setValue(editContact.phone);
+  }, [editContact]);
 
-  //! REGISTER
-  const updateMyUser: FormEventHandler<HTMLFormElement> = async (e) => {
+  //! UPDATE CONTACT
+  const updateContact: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    if (!myUser) return;
+    if (!editContact) return;
     if (!nameInput.verify()) return;
     if (!phoneInput.verify()) return;
 
-    setUpdatingMyUser(true);
+    setUpdatingContact(true);
     try {
       //! Save image in firebase storage if there is one
       let photoURL = "";
       if (selectedImage) {
-        await FirebaseHelper.MyUser.Picture.create(myUser.id, selectedImage);
-        photoURL = await FirebaseHelper.MyUser.Picture.get(myUser.id);
+        await FirebaseHelper.Contact.Picture.create(
+          editContact.id,
+          selectedImage
+        );
+        photoURL = await FirebaseHelper.Contact.Picture.get(editContact.id);
       }
 
-      const myUserUpdates: Partial<MyUser> = {};
+      const myContactUpdates: Partial<Contact> = {};
 
       if (photoURLUpdated) {
-        myUserUpdates.photoURL = photoURL;
+        myContactUpdates.photoURL = photoURL;
       }
       if (nameUpdated) {
-        myUserUpdates.name = nameInput.getValue()!;
+        myContactUpdates.name = nameInput.getValue()!;
       }
       if (phoneUpdated) {
-        myUserUpdates.phone = phoneInput.getValue()!;
+        myContactUpdates.phone = phoneInput.getValue()!;
       }
 
-      await FirebaseHelper.MyUser.update(myUser, myUserUpdates);
-      notify("Profile updated", { type: "success" });
+      await FirebaseHelper.Contact.update(editContact, myContactUpdates);
+      notify("Contact updated", { type: "success" });
       setPhotoURLUpdated(false);
       setNameUpdated(false);
       setPhoneUpdated(false);
@@ -81,7 +79,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
       console.log(error);
       notify("An error occured while updating");
     }
-    setUpdatingMyUser(false);
+    setUpdatingContact(false);
   };
 
   return (
@@ -91,9 +89,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
           <BackAndroidIcon
             color="white"
             size={25}
-            onClick={() => setPage(Pages.Main)}
+            onClick={() => setPage(Pages.Contacts)}
           />
-          <p className="font-semibold text-white">Edit Profile</p>
+          <p className="font-semibold text-white">Edit Contact</p>
           <BackAndroidIcon size={25} hidden />
         </div>
       </div>
@@ -101,7 +99,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
         <EditableAvatar
           selectedImage={selectedImage}
           setSelectedImage={setSelectedImage}
-          photoURL={myUser?.photoURL}
+          photoURL={editContact?.photoURL}
           onChooseImage={() => setPhotoURLUpdated(true)}
           size={120}
           withBackground
@@ -109,8 +107,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
         />
       </div>
       <form
-        className="flex w-full px-10 flex-col justify-center gap-10 mb-10"
-        onSubmit={updateMyUser}
+        className="flex flex-col w-full px-10 justify-center gap-10"
+        onSubmit={updateContact}
       >
         <div className="flex flex-col gap-1">
           <p className="text font-semibold">Name</p>
@@ -134,21 +132,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
         <MyButton
           type="submit"
           label="Update"
-          disabled={!hasUpdates || updatingMyUser}
+          disabled={!hasUpdates || updatingContact}
         />
       </form>
-      <div className="w-min px-10 mt-10">
-        <MyButton
-          type="button"
-          label="Sign Out"
-          outlined
-          className="rounded-full"
-          pY={0.2}
-          onClick={() => signOut(auth)}
-        />
-      </div>
     </div>
   );
 };
 
-export default ProfilePage;
+export default EditContactPage;

@@ -1,4 +1,5 @@
 export interface Contact {
+  id: string;
   name: string;
   phone: string;
   photoURL: string;
@@ -6,6 +7,7 @@ export interface Contact {
 
 export const constructEmptyContact = (): Contact => {
   return {
+    id: "",
     name: "",
     phone: "",
     photoURL: "",

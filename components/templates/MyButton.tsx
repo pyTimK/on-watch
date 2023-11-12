@@ -36,6 +36,7 @@ const MyButton: React.FC<MyButtonProps> = ({
         "text-center w-full max-w-sm rounded-lg bg-darker_primary m-auto shadow-none outline-none select-none",
         outlined && "bg-transparent border border-zinc-600",
         dashed && "border-dashed",
+        disabled && "cursor-default opacity-50",
         className
       )}
       onClick={onClick}
@@ -47,7 +48,7 @@ const MyButton: React.FC<MyButtonProps> = ({
         className={twMerge(
           "m-auto min-w-full min-h-full rounded-lg",
           classNameBtn,
-          disabled ? "cursor-default opacity-50" : "cursor-pointer opacity-100"
+          disabled ? "cursor-default" : "cursor-pointer"
         )}
       >
         <p

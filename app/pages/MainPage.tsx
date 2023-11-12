@@ -15,41 +15,58 @@ interface MainPageProps {}
 
 const MainPage: React.FC<MainPageProps> = ({}) => {
   const { watch, proximity } = useContext(GlobalContext);
-  const [marker, setMarker] = useState<any>();
   const [maps, setMaps] = useState<any>();
+  const [watchMarker, setWatchMarker] = useState<any>();
+  const [circleMarker, setCircleMarker] = useState<any>();
   const [circle, setCircle] = useState<any>();
   const [openLocationBS, setOpenLocationBS] = useState(false);
+  const [openCircleCenterLocationBS, setOpenCircleCenterLocationBS] =
+    useState(false);
 
   const [defaultCenter, setDefaultCenter] = useState({
     lat: 14.610535,
     lng: 121.00488,
   });
+  const [centerCircle, setCenterCircle] = useState({
+    lat: 14.610535,
+    lng: 121.00488,
+  });
+  // console.log(centerCircle);
 
-  //! UPDATE MARKER POSITION
+  //! UPDATE WATCH MARKER POSITION
   useEffect(() => {
-    if (marker && watch?.latitude && watch?.longitude) {
+    if (watchMarker && watch?.latitude && watch?.longitude) {
       const defaultCenter = {
         lat: parseFloat(watch.latitude),
         lng: parseFloat(watch.longitude),
       };
       setDefaultCenter(defaultCenter);
-      marker.setPosition(defaultCenter);
+      watchMarker.setPosition(defaultCenter);
     }
-  }, [marker, watch?.latitude, watch?.longitude]);
+  }, [watchMarker, watch?.latitude, watch?.longitude]);
+
+  //! UPDATE CIRCLE MARKER POSITION
+  useEffect(() => {
+    if (circleMarker && proximity?.lat && proximity?.lng) {
+      const center = { lat: proximity.lat, lng: proximity.lng };
+      setCenterCircle(center);
+      circleMarker.setPosition(center);
+    }
+  }, [circleMarker, proximity?.lat, proximity?.lng]);
 
   //! UPDATE CIRCLE POSITION
   useEffect(() => {
-    if (circle && defaultCenter && proximity?.distance_limit_km) {
-      circle.setRadius(proximity.distance_limit_km);
-      circle.setCenter(defaultCenter);
+    if (circle && centerCircle && proximity?.distance_limit_m) {
+      circle.setRadius(proximity.distance_limit_m);
+      circle.setCenter(centerCircle);
     }
-  }, [circle, proximity?.distance_limit_km, defaultCenter]);
+  }, [circle, proximity?.distance_limit_m, centerCircle]);
 
-  //! UPDATE MARKER ICON
+  //! UPDATE WATCH MARKER ICON
   useEffect(() => {
-    if (marker && maps) {
+    if (watchMarker && maps) {
       // console.log(marker);
-      marker.setIcon({
+      watchMarker.setIcon({
         url:
           watch?.emergency === "1"
             ? "/images/redmarker.svg"
@@ -59,7 +76,7 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
         anchor: new maps.Point(20, 20), // anchor
       });
     }
-  }, [marker, maps, watch?.emergency]);
+  }, [watchMarker, maps, watch?.emergency]);
 
   return (
     <div
@@ -81,19 +98,21 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
         onGoogleApiLoaded={({ map, maps }) => {
           setMaps(maps);
 
+          //! CIRCLE
           const new_circle = new maps.Circle({
             strokeColor: Colors.darker_primary,
-            strokeOpacity: 0.4,
+            strokeOpacity: 0.8,
             strokeWeight: 2,
             fillColor: Colors.light_primary,
-            fillOpacity: 0,
+            fillOpacity: 0.08,
             map,
             center: defaultCenter,
-            radius: proximity?.distance_limit_km,
+            radius: proximity?.distance_limit_m,
           });
           setCircle(new_circle);
 
-          const new_marker = new maps.Marker({
+          //! WATCH MARKER
+          const watch_marker = new maps.Marker({
             position: { lat: defaultCenter.lat, lng: defaultCenter.lng },
             map,
             title: watch?.name,
@@ -105,11 +124,31 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
             },
             clickable: true,
           });
-          setMarker(new_marker);
+          setWatchMarker(watch_marker);
 
-          maps.event.addDomListener(new_marker, "click", function () {
+          maps.event.addDomListener(watch_marker, "click", function () {
             setOpenLocationBS((open) => !open);
           });
+
+          //! CIRCLE CENTER MARKER
+          const circle_marker = new maps.Marker({
+            position: centerCircle,
+            map,
+            icon: {
+              url: "/images/center_marker.svg", // url
+              scaledSize: new maps.Size(30, 30), // scaled size
+              origin: new maps.Point(0, 0), // origin
+              anchor: new maps.Point(15, 15), // anchor
+            },
+            clickable: true,
+          });
+          setCircleMarker(circle_marker);
+
+          //! On click Circle Center Marker
+          maps.event.addDomListener(circle_marker, "click", function () {
+            setOpenCircleCenterLocationBS((open) => !open);
+          });
+
           // console.log(`New Marker: ${defaultCetner}`);
           // new maps.Marker({
           //   position: { lat: readingData.lat, lng: readingData.long },
@@ -130,6 +169,13 @@ const MainPage: React.FC<MainPageProps> = ({}) => {
         lng={defaultCenter.lng}
         title={watch !== null ? `${watch?.name}'s Position` : "Position"}
         onClose={() => setOpenLocationBS(false)}
+      />
+      <LocationBottomSheet
+        open={openCircleCenterLocationBS}
+        lat={centerCircle.lat}
+        lng={centerCircle.lng}
+        title="Circle Boundary Position"
+        onClose={() => setOpenCircleCenterLocationBS(false)}
       />
     </div>
   );

@@ -10,70 +10,68 @@ import { GlobalContext } from "../wrappers/GlobalWrapper";
 import { MyUser } from "@/classes/MyUser";
 import MyInput from "@/components/templates/MyInput";
 import MyButton from "@/components/templates/MyButton";
-import { auth } from "../firebase";
-import { signOut } from "firebase/auth";
+import { Watch } from "@/classes/Watch";
 
-interface ProfilePageProps {}
+interface EditWatchPageProps {}
 
-const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
-  const { myUser } = useContext(GlobalContext);
-  const { setPage } = useContext(PageWrapperContext);
+const EditWatchPage: React.FC<EditWatchPageProps> = ({}) => {
+  const { editWatch, setPage } = useContext(PageWrapperContext);
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
   const nameInput = useInputField((name) => [
-    [!name, "Please Enter your name"],
+    [!name, "Please Enter the wearer's name"],
   ]);
 
   const phoneInput = useInputField((phone) => [
-    [!phone, "Please Enter your phone number"],
+    [!phone, "Please Enter the wearer's phone number"],
     [!/^[0-9+]*$/.test(phone!), "Phone number must only contain digits or '+'"],
   ]);
 
   const [photoURLUpdated, setPhotoURLUpdated] = useState(false);
   const [nameUpdated, setNameUpdated] = useState(false);
   const [phoneUpdated, setPhoneUpdated] = useState(false);
-  const [updatingMyUser, setUpdatingMyUser] = useState(false);
+  const [updatingWatch, setUpdatingWatch] = useState(false);
 
   const hasUpdates = photoURLUpdated || nameUpdated || phoneUpdated;
 
   //! INITIALIZE FIELDS
   useEffect(() => {
-    if (!myUser) return;
-    nameInput.setValue(myUser.name);
-    phoneInput.setValue(myUser.phone);
-  }, [myUser]);
+    if (!editWatch) return;
+    nameInput.setValue(editWatch.name);
+    phoneInput.setValue(editWatch.phone);
+  }, [editWatch]);
 
-  //! REGISTER
-  const updateMyUser: FormEventHandler<HTMLFormElement> = async (e) => {
+  //! UPDATE WATCH
+  const updateWatch: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
-    if (!myUser) return;
+    if (!editWatch) return;
     if (!nameInput.verify()) return;
     if (!phoneInput.verify()) return;
 
-    setUpdatingMyUser(true);
+    setUpdatingWatch(true);
     try {
       //! Save image in firebase storage if there is one
       let photoURL = "";
       if (selectedImage) {
-        await FirebaseHelper.MyUser.Picture.create(myUser.id, selectedImage);
-        photoURL = await FirebaseHelper.MyUser.Picture.get(myUser.id);
+        await FirebaseHelper.Watch.Picture.create(editWatch.id, selectedImage);
+        photoURL = await FirebaseHelper.Watch.Picture.get(editWatch.id);
       }
 
-      const myUserUpdates: Partial<MyUser> = {};
+      const myWatchUpdates: Partial<Watch> = {};
 
       if (photoURLUpdated) {
-        myUserUpdates.photoURL = photoURL;
+        myWatchUpdates.photoURL = photoURL;
       }
       if (nameUpdated) {
-        myUserUpdates.name = nameInput.getValue()!;
+        myWatchUpdates.name = nameInput.getValue()!;
       }
       if (phoneUpdated) {
-        myUserUpdates.phone = phoneInput.getValue()!;
+        myWatchUpdates.phone = phoneInput.getValue()!;
       }
 
-      await FirebaseHelper.MyUser.update(myUser, myUserUpdates);
-      notify("Profile updated", { type: "success" });
+      await FirebaseHelper.Watch.update(editWatch, myWatchUpdates);
+      notify("Watch Profile updated", { type: "success" });
       setPhotoURLUpdated(false);
       setNameUpdated(false);
       setPhoneUpdated(false);
@@ -81,7 +79,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
       console.log(error);
       notify("An error occured while updating");
     }
-    setUpdatingMyUser(false);
+    setUpdatingWatch(false);
   };
 
   return (
@@ -91,9 +89,9 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
           <BackAndroidIcon
             color="white"
             size={25}
-            onClick={() => setPage(Pages.Main)}
+            onClick={() => setPage(Pages.Watch)}
           />
-          <p className="font-semibold text-white">Edit Profile</p>
+          <p className="font-semibold text-white">Edit Watch Wearer Profile</p>
           <BackAndroidIcon size={25} hidden />
         </div>
       </div>
@@ -101,7 +99,7 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
         <EditableAvatar
           selectedImage={selectedImage}
           setSelectedImage={setSelectedImage}
-          photoURL={myUser?.photoURL}
+          photoURL={editWatch?.photoURL}
           onChooseImage={() => setPhotoURLUpdated(true)}
           size={120}
           withBackground
@@ -109,8 +107,8 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
         />
       </div>
       <form
-        className="flex w-full px-10 flex-col justify-center gap-10 mb-10"
-        onSubmit={updateMyUser}
+        className="flex flex-col w-full px-10 justify-center gap-10"
+        onSubmit={updateWatch}
       >
         <div className="flex flex-col gap-1">
           <p className="text font-semibold">Name</p>
@@ -134,21 +132,11 @@ const ProfilePage: React.FC<ProfilePageProps> = ({}) => {
         <MyButton
           type="submit"
           label="Update"
-          disabled={!hasUpdates || updatingMyUser}
+          disabled={!hasUpdates || updatingWatch}
         />
       </form>
-      <div className="w-min px-10 mt-10">
-        <MyButton
-          type="button"
-          label="Sign Out"
-          outlined
-          className="rounded-full"
-          pY={0.2}
-          onClick={() => signOut(auth)}
-        />
-      </div>
     </div>
   );
 };
 
-export default ProfilePage;
+export default EditWatchPage;

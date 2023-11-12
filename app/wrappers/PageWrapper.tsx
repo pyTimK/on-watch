@@ -2,7 +2,14 @@ import FirebaseHelper from "@/classes/FirebaseHelper";
 import EmergencyBottomSheet from "@/components/custom/EmergencyBottomSheet";
 import Footer from "@/components/custom/Footer";
 import { useCalculateDivHeight } from "@/hooks/useCalculateDivHeight";
-import { createContext, useContext, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import MainPage from "../pages/MainPage";
 import { GlobalContext } from "./GlobalWrapper";
 import SettingsPage from "../pages/SettingsPage";
@@ -13,11 +20,14 @@ import WatchPage from "../pages/WatchPage";
 import NotificationsPage from "../pages/NotificationsPage";
 import AboutPage from "../pages/AboutPage";
 import LocationBottomSheet from "@/components/custom/LocationBottomSheet";
-
-export const PageWrapperContext = createContext({
-  page: Pages.Main,
-  setPage: (page: Pages) => {},
-});
+import EditWatchPage from "../pages/EditWatchPage";
+import { Watch } from "@/classes/Watch";
+import { Contact } from "@/classes/Contact";
+import EditContactPage from "../pages/EditContactPage";
+import AddContactPage from "../pages/AddContactPage";
+import OutOfBoundsBottomSheet from "@/components/custom/OutOfBoundsBottomSheet";
+import haversineDistanceKm from "@/myfunctions/haversineDistanceKm";
+import CallBottomSheet from "@/components/custom/CallBottomSheet";
 
 export const enum Pages {
   Main,
@@ -28,20 +38,41 @@ export const enum Pages {
   Watch,
   Notifications,
   About,
+  EditWatch,
+  EditContact,
+  AddContact,
 }
+
+export const PageWrapperContext = createContext({
+  page: Pages.Main,
+  setPage: (page: Pages) => {},
+  editWatch: null as Watch | null,
+  setEditWatch: (watch: Watch | null) => {},
+  editContact: null as Contact | null,
+  setEditContact: (contact: Contact | null) => {},
+  setCallBSOpen: ((open: boolean) => {}) as Dispatch<SetStateAction<boolean>>,
+});
+
 interface PageWrapperProps {}
 
 const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
-  const { watch } = useContext(GlobalContext);
+  const { myUser, watch, proximity } = useContext(GlobalContext);
 
   //! Page
   const [page, setPage] = useState<Pages>(Pages.Main);
 
-  //! EMERGENCY BOTTOM SHEET
+  //! ON CLOSE OF EMERGENCY BOTTOM SHEET
   const onCloseEmergencyBS = () => {
     if (!watch?.id) return;
 
-    FirebaseHelper.Watch.update(watch?.id, { emergency: "0" });
+    FirebaseHelper.Watch.update(watch, { emergency: "0" });
+  };
+
+  //! ON CLOSE OF OUT OF BOUNDS BOTTOM SHEET
+  const onCloseOutOfBoundsBS = () => {
+    if (!proximity?.id) return;
+
+    FirebaseHelper.Proximity.update(proximity, { oob_notified: true });
   };
 
   //! AUTOMATIC MAP HEIGHT
@@ -51,8 +82,61 @@ const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
     []
   );
 
+  //! EDIT WATCH
+  const [editWatch, setEditWatch] = useState<Watch | null>(null);
+
+  //! EDIT CONTACT
+  const [editContact, setEditContact] = useState<Contact | null>(null);
+
+  //! CALL BOTTOM SHEET
+  const [callBSOpen, setCallBSOpen] = useState(false);
+
+  //! Check if watch is out of bounds
+  useEffect(() => {
+    if (!watch || !proximity) return;
+
+    if (!proximity.oob && !proximity.oob_notified) {
+      const distanceKm = haversineDistanceKm(
+        parseFloat(watch.latitude),
+        parseFloat(watch.longitude),
+        proximity.lat,
+        proximity.lng
+      );
+      const distanceLimitKm = proximity.distance_limit_m / 1000;
+
+      if (distanceKm > distanceLimitKm) {
+        FirebaseHelper.Proximity.update(proximity, { oob: true });
+      }
+    } else if (proximity.oob && proximity.oob_notified) {
+      const distanceKm = haversineDistanceKm(
+        parseFloat(watch.latitude),
+        parseFloat(watch.longitude),
+        proximity.lat,
+        proximity.lng
+      );
+      const distanceLimitKm = proximity.distance_limit_m / 1000;
+
+      if (distanceKm <= distanceLimitKm) {
+        FirebaseHelper.Proximity.update(proximity, {
+          oob: false,
+          oob_notified: false,
+        });
+      }
+    }
+  }, [watch, proximity]);
+
   return (
-    <PageWrapperContext.Provider value={{ page, setPage }}>
+    <PageWrapperContext.Provider
+      value={{
+        page,
+        setPage,
+        editWatch,
+        setEditWatch,
+        editContact,
+        setEditContact,
+        setCallBSOpen,
+      }}
+    >
       <div className="bg-bg" ref={targetRef} style={{ width: "100%" }}>
         {page === Pages.Main ? (
           <MainPage />
@@ -70,15 +154,26 @@ const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
           <NotificationsPage />
         ) : page === Pages.About ? (
           <AboutPage />
+        ) : page === Pages.EditWatch ? (
+          <EditWatchPage />
+        ) : page === Pages.EditContact ? (
+          <EditContactPage />
+        ) : page === Pages.AddContact ? (
+          <AddContactPage />
         ) : (
           <div>404: Page not found</div>
         )}
       </div>
       <Footer divRef={sourceRef} />
       <EmergencyBottomSheet
-        open={watch?.emergency === "1"}
+        open={watch?.emergency === "1" && myUser?.emergency_notif === true}
         onClose={onCloseEmergencyBS}
       />
+      <OutOfBoundsBottomSheet
+        open={proximity !== null && proximity.oob && !proximity.oob_notified}
+        onClose={onCloseOutOfBoundsBS}
+      />
+      <CallBottomSheet open={callBSOpen} onClose={() => setCallBSOpen(false)} />
     </PageWrapperContext.Provider>
   );
 };
