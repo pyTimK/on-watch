@@ -48,7 +48,7 @@ const WatchPage: React.FC<WatchPageProps> = ({}) => {
   useEffect(() => {
     const watchIds = myUser?.watch_ids;
     if (!watchIds) return;
-    getWatches(watchIds).then(setWatches);
+    getWatches(watchIds).then((_watches) => setWatches(_watches.reverse()));
   }, [myUser?.watch_ids]);
 
   //! ADD WATCH
@@ -88,7 +88,7 @@ const WatchPage: React.FC<WatchPageProps> = ({}) => {
         </motion.div>
 
         {/* //! WATCHES */}
-        {watches.toReversed().map((watch) => (
+        {watches.map((watch) => (
           <SettingsRow key={watch.id} watch={watch} />
         ))}
       </div>
@@ -150,21 +150,18 @@ const SettingsRow: React.FC<SettingsRowProps> = ({ watch, onClick }) => {
           </div>
         </div>
       </div>
-      {selected ? (
-        <p className="text-xs text-red_light">Selected</p>
-      ) : (
-        <div className="flex items-center gap-4">
-          <CheckCircleIcon onClick={selectWatch} />
+      <div className="flex items-center gap-4">
+        {selected && <p className="text-xs text-red_light">Selected</p>}
+        {!selected && <CheckCircleIcon onClick={selectWatch} />}
 
-          <EditIcon
-            onClick={() => {
-              setEditWatch(watch);
-              setPage(Pages.EditWatch);
-            }}
-          />
-          <DeleteIcon onClick={() => deleteWatch(watch.id)} />
-        </div>
-      )}
+        <EditIcon
+          onClick={() => {
+            setEditWatch(watch);
+            setPage(Pages.EditWatch);
+          }}
+        />
+        {!selected && <DeleteIcon onClick={() => deleteWatch(watch.id)} />}
+      </div>
     </motion.div>
   );
 };

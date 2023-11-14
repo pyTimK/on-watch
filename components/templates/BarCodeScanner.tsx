@@ -20,9 +20,9 @@ const BarcodeScanner: React.FC<BarCodeScannerProps> = ({ onScan }) => {
   }, [result, onScan]);
 
   return (
-    <>
+    <div className="overflow-hidden">
       <video ref={ref} />
-    </>
+    </div>
   );
 };
 

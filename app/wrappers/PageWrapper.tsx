@@ -47,7 +47,9 @@ export const PageWrapperContext = createContext({
   page: Pages.Main,
   setPage: (page: Pages) => {},
   editWatch: null as Watch | null,
-  setEditWatch: (watch: Watch | null) => {},
+  setEditWatch: ((watch: Watch | null) => {}) as Dispatch<
+    SetStateAction<Watch | null>
+  >,
   editContact: null as Contact | null,
   setEditContact: (contact: Contact | null) => {},
   setCallBSOpen: ((open: boolean) => {}) as Dispatch<SetStateAction<boolean>>,
@@ -170,7 +172,12 @@ const PageWrapper: React.FC<PageWrapperProps> = ({}) => {
         onClose={onCloseEmergencyBS}
       />
       <OutOfBoundsBottomSheet
-        open={proximity !== null && proximity.oob && !proximity.oob_notified}
+        open={
+          proximity !== null &&
+          proximity.oob &&
+          !proximity.oob_notified &&
+          proximity.proximity_alarm
+        }
         onClose={onCloseOutOfBoundsBS}
       />
       <CallBottomSheet open={callBSOpen} onClose={() => setCallBSOpen(false)} />

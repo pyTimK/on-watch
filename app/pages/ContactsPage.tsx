@@ -38,7 +38,7 @@ const ContactsPage: React.FC<ContactsPageProps> = ({}) => {
     const contactIds = myUser?.contact_ids;
     if (!contactIds) return;
     getContacts(contactIds).then((_contacts) => {
-      setContacts(_contacts);
+      setContacts(_contacts.reverse());
       setLoading(false);
     });
   }, [myUser?.contact_ids]);
@@ -67,7 +67,7 @@ const ContactsPage: React.FC<ContactsPageProps> = ({}) => {
         </motion.div>
 
         {/* //! CUSTOM CONTACTS */}
-        {contacts.toReversed().map((contact) => (
+        {contacts.map((contact) => (
           <SettingsRow key={contact.id} contact={contact} />
         ))}
 

@@ -7,6 +7,8 @@ export interface Watch {
   phone: string;
   photoURL: string;
   emergencyTimestamp: Date;
+  recipient: string;
+  will_correct_time: boolean;
 }
 
 export const constructEmptyWatch = (): Watch => {
@@ -19,5 +21,7 @@ export const constructEmptyWatch = (): Watch => {
     phone: "0",
     photoURL: "0",
     emergencyTimestamp: new Date(),
+    recipient: "0",
+    will_correct_time: false,
   };
 };

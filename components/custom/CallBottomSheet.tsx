@@ -39,7 +39,7 @@ const CallBottomSheet: React.FC<CallBottomSheetProps> = ({ open, onClose }) => {
     const contactIds = myUser?.contact_ids;
     if (!contactIds) return;
     getContacts(contactIds).then((_contacts) => {
-      setContacts(_contacts);
+      setContacts(_contacts.reverse());
       setLoading(false);
     });
   }, [myUser?.contact_ids]);
@@ -51,7 +51,7 @@ const CallBottomSheet: React.FC<CallBottomSheetProps> = ({ open, onClose }) => {
           Select a contact to call
         </p>
         {/* //! CUSTOM CONTACTS */}
-        {contacts.toReversed().map((contact) => (
+        {contacts.map((contact) => (
           <SettingsRow key={contact.id} contact={contact} />
         ))}
 
@@ -70,7 +70,7 @@ interface SettingsRowProps {
   isDefault?: boolean;
 }
 
-const SettingsRow: React.FC<SettingsRowProps> = ({ contact, onClick }) => {
+const SettingsRow: React.FC<SettingsRowProps> = ({ contact }) => {
   return (
     <motion.div
       whileTap={{ scale: 0.95 }}

@@ -15,7 +15,7 @@ import { Watch } from "@/classes/Watch";
 interface EditWatchPageProps {}
 
 const EditWatchPage: React.FC<EditWatchPageProps> = ({}) => {
-  const { editWatch, setPage } = useContext(PageWrapperContext);
+  const { editWatch, setEditWatch, setPage } = useContext(PageWrapperContext);
 
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
@@ -28,18 +28,35 @@ const EditWatchPage: React.FC<EditWatchPageProps> = ({}) => {
     [!/^[0-9+]*$/.test(phone!), "Phone number must only contain digits or '+'"],
   ]);
 
+  const recipientInput = useInputField((recipient) => [
+    [!recipient, "Please Enter the recipient's phone number"],
+    [
+      !/^[0-9+]*$/.test(recipient!),
+      "Phone number must only contain digits or '+'",
+    ],
+    // must be 11 digits
+    [recipient!.length !== 11, "Phone number must be 11 digits"],
+    // must start with 09
+    [!recipient!.startsWith("09"), "Phone number must start with 09"],
+  ]);
+
   const [photoURLUpdated, setPhotoURLUpdated] = useState(false);
   const [nameUpdated, setNameUpdated] = useState(false);
   const [phoneUpdated, setPhoneUpdated] = useState(false);
+  const [recipientUpdated, setRecipientUpdated] = useState(false);
   const [updatingWatch, setUpdatingWatch] = useState(false);
 
-  const hasUpdates = photoURLUpdated || nameUpdated || phoneUpdated;
+  const [correctingWatchTime, setCorrectingWatchTime] = useState(false);
+
+  const hasUpdates =
+    photoURLUpdated || nameUpdated || phoneUpdated || recipientUpdated;
 
   //! INITIALIZE FIELDS
   useEffect(() => {
     if (!editWatch) return;
     nameInput.setValue(editWatch.name);
     phoneInput.setValue(editWatch.phone);
+    recipientInput.setValue(editWatch.recipient);
   }, [editWatch]);
 
   //! UPDATE WATCH
@@ -48,6 +65,7 @@ const EditWatchPage: React.FC<EditWatchPageProps> = ({}) => {
     if (!editWatch) return;
     if (!nameInput.verify()) return;
     if (!phoneInput.verify()) return;
+    if (!recipientInput.verify()) return;
 
     setUpdatingWatch(true);
     try {
@@ -70,11 +88,16 @@ const EditWatchPage: React.FC<EditWatchPageProps> = ({}) => {
         myWatchUpdates.phone = phoneInput.getValue()!;
       }
 
+      if (recipientUpdated) {
+        myWatchUpdates.recipient = recipientInput.getValue()!;
+      }
+
       await FirebaseHelper.Watch.update(editWatch, myWatchUpdates);
       notify("Watch Profile updated", { type: "success" });
       setPhotoURLUpdated(false);
       setNameUpdated(false);
       setPhoneUpdated(false);
+      setRecipientUpdated(false);
     } catch (error) {
       console.log(error);
       notify("An error occured while updating");
@@ -128,6 +151,15 @@ const EditWatchPage: React.FC<EditWatchPageProps> = ({}) => {
             onChange={() => setPhoneUpdated(true)}
           />
         </div>
+        <div className="flex flex-col gap-1">
+          <p className="text font-semibold">Recipient Phone Number</p>
+          <MyInput
+            placeholder="Recipient Phone Number"
+            className="bg-transparent"
+            inputField={recipientInput}
+            onChange={() => setRecipientUpdated(true)}
+          />
+        </div>
 
         <MyButton
           type="submit"
@@ -135,6 +167,25 @@ const EditWatchPage: React.FC<EditWatchPageProps> = ({}) => {
           disabled={!hasUpdates || updatingWatch}
         />
       </form>
+
+      {editWatch && editWatch.id === "child1" && (
+        <div className="mt-10 px-10">
+          <MyButton
+            type="button"
+            label="Correct Time"
+            className="bg-zinc-700"
+            disabled={correctingWatchTime}
+            onClick={() => {
+              setCorrectingWatchTime(true);
+              FirebaseHelper.Watch.update(editWatch, {
+                will_correct_time: true,
+              }).then((w) => {
+                setCorrectingWatchTime(false);
+              });
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -30,11 +30,10 @@ const MySearchBar: React.FC<MySearchBarProps> = ({ fields }) => {
   };
 
   return (
-    <div className="h-20">
+    <div className="">
       <div
         className={twMerge(
-          "absolute z-40",
-          showResults && "rounded-xl drop-shadow"
+          showResults && "absolute z-40 rounded-xl drop-shadow"
         )}
         style={{ width: "calc(100vw - 2.5rem)" }}
       >
@@ -52,7 +51,13 @@ const MySearchBar: React.FC<MySearchBarProps> = ({ fields }) => {
             className="bg-transparent w-full max-w-sm border-none py-3 px-0"
             divClassName="w-full"
             onChange={updateFilteredFields}
-            onFocus={() => setShowResults(true)}
+            onFocus={() => {
+              //scroll to top
+              if (typeof window !== "undefined") {
+                window.scrollTo(0, 0);
+              }
+              setShowResults(true);
+            }}
             // onBlur={() => setShowResults(false)}
           />
         </div>

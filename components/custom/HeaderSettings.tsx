@@ -13,10 +13,12 @@ const HeaderSettings: React.FC<HeaderSettingsProps> = ({
 }) => {
   const { setPage } = useContext(PageWrapperContext);
   return (
-    <div className="flex justify-between items-center">
-      <BackAndroidIcon size={25} onClick={() => setPage(page)} />
-      <p className="font-semibold">{title}</p>
-      <BackAndroidIcon size={25} hidden />
+    <div className="w-full h-20">
+      <div className=" w-full flex justify-between items-center">
+        <BackAndroidIcon size={25} onClick={() => setPage(page)} />
+        <p className="font-semibold">{title}</p>
+        <BackAndroidIcon size={25} hidden />
+      </div>
     </div>
   );
 };
